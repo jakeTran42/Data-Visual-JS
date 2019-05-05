@@ -1,0 +1,190 @@
+<div class="container">
+    <canvas id="myChart1" width="400" height="400"></canvas>
+    <canvas id="myChart2" width="400" height="400"></canvas>
+    <canvas id="myChart3" width="400" height="400"></canvas>
+    <div id='dashboard'></div>
+</div>
+
+<style>
+    body{
+        width:1060px;
+        margin:50px auto;
+    }
+    path {  stroke: #fff; }
+    path:hover {  opacity:0.9; }
+    rect:hover {  fill:blue; }
+    .axis {  font: 10px sans-serif; }
+    .legend tr{    border-bottom:1px solid grey; }
+    .legend tr:first-child{    border-top:1px solid grey; }
+    
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+    
+    .x.axis path {  display: none; }
+    .legend{
+        margin-bottom:76px;
+        display:inline-block;
+        border-collapse: collapse;
+        border-spacing: 0px;
+    }
+    .legend td{
+        padding:4px 5px;
+        vertical-align:bottom;
+    }
+    .legendFreq, .legendPerc{
+        align:right;
+        width:50px;
+    }
+        
+</style>
+
+
+<!-- <style>
+    .container {
+        display: flex;
+        margin: 50px;
+    }
+</style> -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+
+    // let rawJsonData = null
+
+    fetch('cereal.json')
+    .then(res => res.json())
+    // .then(json => console.log(json)) 
+    .then(json => displayCharts(json))
+    .catch(err => console.log(err.message))
+
+    // Comparison between best and worst rated cereal
+
+    function displayCharts(data) {
+        console.log(data)
+        displayChart1(data)
+        displayChart2(data)
+        displayChart3(data)
+    }
+
+    // Comparing features of highest and lowest cereal
+    function displayChart1(data) {
+        let highestScore = 0
+        let highestRatedCereal = {}
+        data.forEach(element => {
+            if(element.rating > highestScore) {
+                highestScore = element.rating
+                highestRatedCereal = {name: element.name, fat: element.fat, carbo: element.carbo, protein: element.protein, shelf: element.protein, sugar: element.sugar}
+            }
+        });
+        let lowestScore = data[0].rating
+        let lowestRatedCereal = {}
+        data.forEach(element => {
+            if(element.rating < lowestScore) {
+                lowestScore = element.rating
+                lowestRatedCereal = {name: element.name, fat: element.fat, carbo: element.carbo, protein: element.protein, shelf: element.protein, sugar: element.sugar}
+            }
+        });
+
+        var ctx1 = document.getElementById('myChart1').getContext('2d');
+        var chart = new Chart(ctx1, {
+            // The type of chart we want to create
+            type: 'radar',
+
+            // The data for our dataset
+            data: {
+                labels: Object.keys(highestRatedCereal).slice(1),
+                datasets: [{
+                    label: highestRatedCereal.name + " - Highest rated",
+                    backgroundColor: 'rgb(65, 244, 124, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: Object.values(highestRatedCereal).slice(1)
+                }, 
+                 {  label: lowestRatedCereal.name + " - Lowest rated",
+                    backgroundColor: 'rgb(244, 127, 65, 0.2)',
+                    borderColor: 'rgb(160, 65, 244)',
+                    data: Object.values(lowestRatedCereal).slice(1)
+                }]
+            },
+
+            // Configuration options go here
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+
+    function displayChart2(data) {
+
+        const caloriesByBrand = data.reduce((obj, cereal) => {
+            obj[cereal.name] = cereal.calories
+            return obj
+        }, {})
+
+        console.log(caloriesByBrand)
+
+        const keys = Object.keys(caloriesByBrand).slice(0,10)
+        const values = Object.values(caloriesByBrand).slice(0,10)
+
+        var ctx2 = document.getElementById('myChart2').getContext('2d');
+        var chart = new Chart(ctx2, {
+            // The type of chart we want to create
+            type: 'bar',
+            // The data for our dataset
+            data: {
+                labels: keys,
+                datasets: [{
+                    label: 'Cereals by calories (random cereal)',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: values
+                }]
+            },
+
+            // Configuration options go here
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+
+    function displayChart3(data) {
+
+        const sugarByBrand = data.reduce((obj, cereal) => {
+            obj[cereal.name] = cereal.sugars
+            return obj
+        }, {})
+
+        const keys = Object.keys(sugarByBrand).slice(0,10)
+        const values = Object.values(sugarByBrand).slice(0,10)
+
+        var ctx3 = document.getElementById('myChart3').getContext('2d');
+        var chart = new Chart(ctx3, {
+            // The type of chart we want to create
+            type: 'line',
+            // The data for our dataset
+            data: {
+                labels: keys,
+                datasets: [{
+                    label: 'Cereals by sugar (random cereal)',
+                    backgroundColor: 'rgb(65, 148, 244, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: values
+                }]
+            },
+
+            // Configuration options go here
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+</script>
