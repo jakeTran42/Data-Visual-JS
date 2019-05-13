@@ -40,7 +40,7 @@ rect:hover {  fill:blue; }
 
 </style>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
 
 <script>
     function dashboard(id, fData){
@@ -243,7 +243,7 @@ rect:hover {  fill:blue; }
     
     <script>
 
-fetch('Pokemon.csv')
+    fetch('Pokemon.csv')
     .then(res => res.text())
     .then(data => handleCSV(data))
     .then(data =>  frequencyData(data))
